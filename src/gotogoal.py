@@ -30,31 +30,31 @@ class TurtleBot:
         return constant * (self.steering_angle(goal_pose) - self.pose.theta)
     
     def move_goal(self):
-        goal_pose = Pose()
-        goal_pose.x = float(input("x:"))
-        goal_pose.y = float(input("y:"))
-        goal_pose.theta = float(input("theta:"))
-        distance_tolerance = input("tolerance:")
-        vel_msg = Twist()
+        while True:
+            goal_pose = Pose()
+            goal_pose.x = float(input("x:"))
+            goal_pose.y = float(input("y:"))
+            distance_tolerance = input("tolerance:")
+            vel_msg = Twist()
 
-        while self.euclidean_distance(goal_pose) >= distance_tolerance:
-            vel_msg.linear.x = self.linear_vel(goal_pose)
-            vel_msg.linear.y = 0
-            vel_msg.linear.z = 0
+            while self.euclidean_distance(goal_pose) >= distance_tolerance:
+                vel_msg.linear.x = self.linear_vel(goal_pose)
+                vel_msg.linear.y = 0
+                vel_msg.linear.z = 0
 
-            vel_msg.angular.x = 0
-            vel_msg.angular.y = 0
-            vel_msg.angular.z = self.angular_vel(goal_pose)
+                vel_msg.angular.x = 0
+                vel_msg.angular.y = 0
+                vel_msg.angular.z = self.angular_vel(goal_pose)
 
+                self.velocity_publisher.publish(vel_msg)
+
+                self.rate.sleep()
+            
+            vel_msg.linear.x = 0
+            vel_msg.angular.z = 0
             self.velocity_publisher.publish(vel_msg)
 
-            self.rate.sleep()
-        
-        vel_msg.linear.x = 0
-        vel_msg.angular.z = 0
-        self.velocity_publisher.publish(vel_msg)
-
-        rospy.spin()
+            rospy.spin()
 
 if __name__ == '__main__':
     try:
